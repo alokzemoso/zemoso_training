@@ -1,0 +1,42 @@
+ZAlgebra:
+
+The full range of alphabets is used for the numbers. A-Z and 0. 
+A is 1, B is 2.. Z is 26
+ZAlgebra to Decimal Conversion
+AB = 26*1 + 2 = 28
+A0 = 26
+ABCD = (26^3)*1+(26^2)*2+(26^1)*3+(26^0)*4=19010
+
+Assignment 1
+Write a class that represents a ZDigit (can hold 0,A-Z).
+Constructor:
+Accept any character A-Z, 0. Anything else it should throw an IllegalArgumentException.
+	ZDigit zd = new ZDigit('A')
+	ZDigit zd = new ZDigit('0')
+
+Assignment 2
+Write a class that represents a ZNumber
+Constructer: 
+Accept a list of ZDigits.
+
+Implement these methods:
+1) Override toString()
+   - Will output the ZNumber..
+       ZNumber zn = new ZNumber('A','B','C','D')
+       System.out.println(zn) -> ABCD
+
+Assignment 3:
+2) toDecimal()
+   - Will output the decimal value of the ZNumber.
+
+3) Provide additional constructors. All of these should be possible.
+	ZNumber zn = new ZNumber('A','B','C','D')
+	ZNumber zn = new ZNumber("ABCD")
+	ZNumber zn = new ZNumber(['A','B'])
+	
+
+4) Implement a method on ZNumber
+	public ZDigit[] getDigits()
+
+
+Note: ZDigit and ZNumber should be immutable. It should not be possible to create invalid ZDigitor ZNumber instances.
