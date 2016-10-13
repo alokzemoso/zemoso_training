@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Javascript</title>
+	<link href = "xxx.css" type="text/css" rel = "stylesheet"/>
+	
+</head>
+<body>
+	<canvas id="a" height="650" width = "1275" onclick="drawCircle(event)"/>
+	<script>
+	   	var canvas = document.getElementById("a");
+		var ctx = canvas.getContext("2d");
+		var points = [];
+		var numOfPoint = false;
+		var largest = 0.0;
+
+		//function to get the location of the click
+		function getMousePos(canvas, event) {
+			var rect = canvas.getBoundingClientRect();
+			return {
+				x: event.clientX - rect.left,
+		  	        y: event.clientY - rect.top
+	    		};
+		}
+		
+		//function to draw the circle		
+		function drawCircle(event) {
+			var pos = getMousePos(canvas, event);
+			posx = pos.x;
+	        	posy = pos.y;
+			points.push(pos.x);
+			points.push(pos.y);
+			var f = false;
+			for(var i=0; i<points.length-2; i=i+2){
+		    		if(points[i] === pos.x){
+		    			if(points[i+1] === pos.y){
+		    				points.splice(i,2);
+		    				var k = points.length-2;
+		    				points.splice(k,2);
+		    				f = true;
+		    				break;
+		    			}
+			    	}
+		    	}
+		    	if(points.length >= 4 && numOfPoint === false){
+		    		numOfPoint=true;
+		    	}
+		    	if(f === false){
+		    		ctx.fillStyle = "#000000";
+				ctx.beginPath();
+				ctx.arc(posx, posy, 2, 0, 2*Math.PI);
+		    	}
+		    	else{
+		    		ctx.fillStyle = "#ffffff";
+		        	ctx.beginPath();
+		    		ctx.arc(posx, posy, 2, 0, 2*Math.PI);
+		    	}	
+		    	ctx.fill();
+
+		    	//Checking for number of points and finding the pair of points at max distance
+		    	var dist = [];
+                    	if(numOfPoint === true){
+		    		var dictionary = {}
+				for(var i=0; i<points.length-2; i=i+2){
+					for(var j=i+2; j<points.length-1; j=j+2){
+						var len = Math.sqrt(Math.pow((points[j]-points[i]),2)
+							+ Math.pow((points[j+1]-points[i+1]),2));
+						dictionary[len] = [points[i],points[i+1],points[j],points[j+1]];
+						dist.push(len);
+					}
+				}
+				largest = Math.max.apply(null,dist);
+
+				//finding the mid point and drawing circle
+				var midx = (dictionary[largest][0]+dictionary[largest][2])/2;
+				var midy = (dictionary[largest][1]+dictionary[largest][3])/2;
+			
+				//clearing the canvas of present circle and points
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			
+				//marking the points
+				markPoints();
+
+				//drawing the circle
+				ctx.beginPath();
+				ctx.arc(midx,midy,largest/2,0,2*Math.PI);
+				ctx.stroke();
+			 
+				//if there is a 3r point outside circle finding the centroid and drawing the new circle
+				for(var i=0; i<points.length-1; i=i+2){
+					var len = Math.sqrt(Math.pow((midx-points[i]),2)
+						+ Math.pow((midy-points[i+1]),2));
+					largest = Math.max.apply(null,dist);
+					if(len > largest/2){
+						var D =    (points[i] - dictionary[largest][2])
+						 	 * (dictionary[largest][1] - dictionary[largest][3])
+							 - (dictionary[largest][0] - dictionary[largest][2])
+							 * (points[i+1] - dictionary[largest][3]);
+
+						var circCenterX = (((points[i] - dictionary[largest][2])
+								  * (points[i] + dictionary[largest][2])
+								  + (points[i+1] - dictionary[largest][3])
+								  * (points[i+1] + dictionary[largest][3])) / 2 
+								  * (dictionary[largest][1] - dictionary[largest][3])
+								  -((dictionary[largest][0]-dictionary[largest][2])
+								  * (dictionary[largest][0] + dictionary[largest][2])
+								  + (dictionary[largest][1] - dictionary[largest][3]) 
+								  * (dictionary[largest][1] + dictionary[largest][3])) / 2
+								  * (points[i+1] - dictionary[largest][3]))/D;
+	
+						var circCenterY = (((dictionary[largest][0]-dictionary[largest][2])
+								   *(dictionary[largest][0]+dictionary[largest][2])
+								   +(dictionary[largest][1]-dictionary[largest][3])
+    								   *(dictionary[largest][1]+dictionary[largest][3]))/2
+							           *(points[i]-dictionary[largest][2])
+								   -((points[i]-dictionary[largest][2])
+								   *(points[i]+dictionary[largest][2])
+								   +(points[i+1]-dictionary[largest][3])
+								   *(points[i+1]+dictionary[largest][3]))/2
+								   *(dictionary[largest][0]-dictionary[largest][2]))/D;
+
+						var l = Math.sqrt(Math.pow((circCenterX-points[i]),2)
+						      + Math.pow((circCenterY-points[i+1]),2));
+
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						ctx.beginPath();
+						ctx.arc(circCenterX,circCenterY,l,0,2*Math.PI);
+				    		ctx.stroke();
+				    		markPoints();
+						break;
+
+					}
+				}
+			}
+		}
+
+		//function to mark the points array
+		function markPoints(){
+			for(var i=0;i<points.length-1;i=i+2){
+				ctx.fillStyle = "#000000";
+			        ctx.beginPath();
+			        ctx.arc(points[i], points[i+1], 2, 0, 2*Math.PI);
+        	                ctx.fill();
+			}
+		}
+		
+		
+	</script>
+</body>
+</html>
